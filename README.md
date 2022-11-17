@@ -15,7 +15,7 @@
 ### 个股
 #### 基本行情
 难点：因为免费的数据接口时长数据有问题，所以要使用python进行数据获取，存储到`mysql`中  
-解决：暂定使用baostock获取数据，存取数据库 http://baostock.com/baostock/index.php
+难点: 把所有的jsdata包换成efinance包
 #### 行情
 #### 资金流
 ## strategy 策略
