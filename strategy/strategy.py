@@ -4,14 +4,17 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def calculate_prof_pct(data):
+def calculate_profit_pct(data):
     # 计算单次收益率：开仓、平仓（开仓的全部股数）
     # profit 利润
     # percent 百分比
-    # 只留下有交易信号的数据 筛选
-    data = data[data['signal'] != 0];
-    # 计算收益率  (市价-成本价)/成本价
-    data['profit_pct'] = (data['close']-data['close'].shift(1))/data['close'].shift(1) * 100
+    # 下面这种写法会引起settingWithCopyWarning, 因为你修改数据，会影响原始数据
+    # # 只留下有交易信号的数据 筛选
+    # data = data[data['signal'] != 0];
+    # # 计算收益率  (市价-成本价)/成本价
+    # data['profit_pct'] = (data['close']-data['close'].shift(1))/data['close'].shift(1) * 100
+    # 修改以后
+    data['profit_pct'] = data.loc[data['signal'] != 0, 'close'].pct_change()
     # 获得每一次平仓的收益
     data = data[data['signal'] == -1]
     return data
