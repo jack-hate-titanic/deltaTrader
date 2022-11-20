@@ -24,8 +24,8 @@ pd.set_option('display.max_columns', 1000)
 def getStockList():
     # 将所有股票列表转换成数组
     stock_list = ef.stock.get_realtime_quotes(['深A']);
-    stock_list.index = stock_list['日期']
-    return stock_list["股票代码"];
+    stock_list = handleData(stock_list);
+    return stock_list['code'];
 
 
 '''
@@ -44,24 +44,43 @@ def getSingleStockPrice(code, start_time = None, end_time = None):
         data = ef.stock.get_quote_history(code, start_time, end_time);
     else:
         data = ef.stock.get_quote_history(code, start_time, end_time);
-    data.index = data['日期']
+    data = handleData(data);
     return data;
 
 
 # 导出股票行情
 def exportStockData(data, filename, mode = None):
     file_root = '/Users/wson/Desktop/Trader/data/price/' + filename + '.csv';
-    data.index.names = ['number']
     if mode == 'a':
         # 因为是新加入的数据，要排到后面，所以header为false
         data.to_csv(file_root, mode=mode, header=False);
         # 删除重复值
         data = pd.read_csv(file_root);
         # 以日期为准进行删除重复值
-        data = data.drop_duplicates(subset=['日期']);
-        data.sort_values('日期');
+        data = data.drop_duplicates(subset=['date']);
+        data.sort_values('date');
         data.to_csv(file_root, index=False);
     else:
         data.to_csv(file_root);
     print('已成功存储至：', file_root);
 
+
+# 数据转化
+def handleData(data):
+    data.rename(
+        columns={
+            "股票名称": 'name',
+            "股票代码": 'code',
+            "日期": 'date',
+            "开盘": 'open',
+            "收盘": 'close',
+            "最高": 'high',
+            "最低": "low",
+            "涨跌幅": 'close_pct',
+            "成交量": 'volume',
+            "成交额": 'money'
+        },
+        inplace=True
+    );
+    data.index = pd.to_datetime(data['date']);
+    return data;

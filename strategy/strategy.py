@@ -1,19 +1,23 @@
 import data.stock as st;
 import numpy as np;
-import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 
 
 def calculate_prof_pct(data):
     # 计算单次收益率：开仓、平仓（开仓的全部股数）
-    data.loc[data['signal'] != 0, 'profit_pct'] = (data['close'] - data['close'].shift(1)) / data['close'].shift(
-        1) * 100
+    # profit 利润
+    # percent 百分比
+    # 只留下有交易信号的数据 筛选
+    data = data[data['signal'] != 0];
+    # 计算收益率  (市价-成本价)/成本价
+    data['profit_pct'] = (data['close']-data['close'].shift(1))/data['close'].shift(1) * 100
+    # 获得每一次平仓的收益
     data = data[data['signal'] == -1]
     return data
 
 
-def caculate_max_drawdown(data, window):
+def  caculate_max_drawdown(data, window):
     # 计算最大回撤
     # 选取时间周期中的最大净值
     data['roll_max'] = data['close'].rolling(window, min_periods=1).max()
@@ -49,7 +53,7 @@ def caculate_sharpe(data):
     sharpe_year = sharpe * np.sqrt(252)
     return sharpe, sharpe_year
 
-def calculate_cum_prof(data):
+def  calculate_cum_prof(data):
     """
     计算累计收益率 1*(1+3%)
     :param data: dataframe
