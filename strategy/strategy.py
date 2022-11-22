@@ -21,10 +21,11 @@ def calculate_profit_pct(data):
 
 
 def  caculate_max_drawdown(data, window):
-    # 计算最大回撤
-    # 选取时间周期中的最大净值
-    data['roll_max'] = data['close'].rolling(window, min_periods=1).max()
-    # 计算当天的回撤比=(谷值-峰值)/峰值=谷值/峰值-1
+    # 计算最大回撤, 风险指标
+    # 选取时间周期(时间窗口window = 2,代表过去两天的)
+    # 选取时间周期中的最大净值，就是都是正值
+    data['roll_max'] = data['close'].rolling(window=252, min_periods=1).max()
+    # 计算当天的回撤比=(谷值-峰值)/峰值=谷值/峰值-1，dd的意思是drawdown
     data['daily_dd'] = data['close'] / data['roll_max'] - 1
     # 选取时间周期内最大的回撤比，即最大回撤
     data['max_dd'] = data['daily_dd'].rolling(window, min_periods=1).min()
@@ -47,6 +48,9 @@ def caculate_sharpe(data):
     :return: float
     """
     # 公式：sharpe = (回报率的均值 - 无风险利率) / 回报率的标准差
+    # 因子项： 回报率均值 = 日涨跌幅.mean()
+    # 因子项： 无风险利率 3%/252
+    # 因子项： 回报率的标准差 日涨跌幅.stddeviation()
     # daily_return = data['close'].pct_change()  # 演示部分
     daily_return = data['profit_pct']  # 策略应用后
     avg_return = daily_return.mean()
@@ -66,24 +70,21 @@ def  calculate_cum_prof(data):
     return data
 
 
-def week_period_strategy(code, timeperiod, start_time, end_time):
-    data = st.getSingleStockPrice(code, timeperiod, start_time, end_time);
-    data['weekday'] = data.index.weekday;
-    # 周四买入
-    data['buy_signal'] = np.where(data['weekday'] == 3, 1, 0);
-    # 周一卖出
-    data['sell_signal'] = np.where(data['weekday'] == 0, -1, 0);
+def week_period_strategy(code, start_time, end_time):
+    data = st.getSingleStockPrice(code, start_time, end_time);
+    data['buy_signal'] = np.where(data.index.weekday == 3, 1, 0);
+    data['sell_signal'] = np.where(data.index.weekday == 1, -1, 0);
     data = compose_singal(data);
-    data = calculate_prof_pct(data)
+    data = calculate_profit_pct(data);
     data = calculate_cum_prof(data)  # 计算累计收益率
-    print(data);
+    data = caculate_max_drawdown(data, 252) # 计算最大回撤比
+    print(data[['close', 'signal', 'profit_pct', 'cum_profit', 'max_dd']]);
+    show_chart(data[['daily_dd', 'max_dd']])
 
 
-# if __name__ == '__main__':
-#     code = '000100.XSHE';
-#     # week_period_strategy(code, 'daily', '2022-03-01', datetime.date.today());
-#     df = st.getSingleStockPrice(code, 'daily', '2022-03-01', datetime.date.today())
-#     df = caculate_max_drawdown(df, 30)
-#     print(df[['close', 'roll_max', 'daily_dd', 'max_dd']])
-#     df[['daily_dd', 'max_dd']].plot()
-#     plt.show();
+def show_chart(data):
+    data.plot();
+    plt.show();
+
+
+
