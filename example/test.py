@@ -1,7 +1,6 @@
 import data.stock as st;
 import strategy.strategy as strategy;
 import numpy as np;
+import strategy.compare as sh;
 
-code = '000100'
-
-strategy.week_period_strategy(code, '20220103', '20220803');
+sh.compare_sharpe_ratio();

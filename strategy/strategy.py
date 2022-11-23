@@ -52,7 +52,7 @@ def caculate_sharpe(data):
     # 因子项： 无风险利率 3%/252
     # 因子项： 回报率的标准差 日涨跌幅.stddeviation()
     # daily_return = data['close'].pct_change()  # 演示部分
-    daily_return = data['profit_pct']  # 策略应用后
+    daily_return = data['close'].pct_change()  # 策略应用后
     avg_return = daily_return.mean()
     sd_return = daily_return.std()
     # 计算夏普：每日收益率 * 252 = 每年收益率
