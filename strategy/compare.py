@@ -14,5 +14,6 @@ def compare_sharpe_ratio(codes=[], start_time='20180101', end_time="20220101"):
     # 把夏普比率和code存入dataframe中
     df = pd.DataFrame(sharpes, columns=['code', 'sharpe']).set_index('code');
     # 可视化夏普比率
-    df.plot.bar(title="sharpe")
+    df.plot.bar(title="sharpe");
+    plot.xticks(rotation=30);
     plot.show();

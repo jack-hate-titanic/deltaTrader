@@ -3,4 +3,5 @@ import strategy.strategy as strategy;
 import numpy as np;
 import strategy.compare as sh;
 
-sh.compare_sharpe_ratio();
+data = st.get_csv_price('000100', '2020-01-01', '2020-02-01');
+# print(data);

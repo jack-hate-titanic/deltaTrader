@@ -20,7 +20,7 @@ def calculate_profit_pct(data):
     return data
 
 
-def  caculate_max_drawdown(data, window):
+def calculate_max_drawdown(data, window):
     # 计算最大回撤, 风险指标
     # 选取时间周期(时间窗口window = 2,代表过去两天的)
     # 选取时间周期中的最大净值，就是都是正值
@@ -71,15 +71,15 @@ def  calculate_cum_prof(data):
 
 
 def week_period_strategy(code, start_time, end_time):
-    data = st.getSingleStockPrice(code, start_time, end_time);
+    data = st.get_single_stock_price(code, start_time, end_time);
     data['buy_signal'] = np.where(data.index.weekday == 3, 1, 0);
     data['sell_signal'] = np.where(data.index.weekday == 1, -1, 0);
     data = compose_singal(data);
     data = calculate_profit_pct(data);
     data = calculate_cum_prof(data)  # 计算累计收益率
-    data = caculate_max_drawdown(data, 252) # 计算最大回撤比
+    data = calculate_max_drawdown(data, 252) # 计算最大回撤比
     print(data[['close', 'signal', 'profit_pct', 'cum_profit', 'max_dd']]);
-    show_chart(data[['daily_dd', 'max_dd']])
+    show_chart(data[['cum_profit']])
 
 
 def show_chart(data):
