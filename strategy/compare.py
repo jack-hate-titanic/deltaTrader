@@ -1,5 +1,5 @@
 import data.stock as stock;
-import strategy.strategy as strategy;
+import week_strategy.strategy as strategy;
 import pandas as pd;
 from matplotlib import pyplot as plot;
 import datetime;

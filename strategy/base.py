@@ -1,7 +1,20 @@
-import data.stock as st;
 import numpy as np;
-import matplotlib.pyplot as plt
-import pandas as pd
+import pandas as pd;
+import matplotlib.pyplot as plt;
+
+
+def show_chart(data):
+    data.plot();
+    plt.show();
+
+
+def compose_signal(data):
+    # 整合信号
+    data['buy_signal'] = np.where((data['buy_signal'] == 1) & (data['buy_signal'].shift(1) == 1), 0, data['buy_signal'])
+    data['sell_signal'] = np.where((data['sell_signal'] == -1) & (data['sell_signal'].shift(1) == -1), 0,
+                                   data['sell_signal'])
+    data['signal'] = data['buy_signal'] + data['sell_signal']
+    return data
 
 
 def calculate_profit_pct(data):
@@ -32,12 +45,13 @@ def calculate_max_drawdown(data, window):
     return data;
 
 
-def compose_singal(data):
-    # 整合信号
-    data['buy_signal'] = np.where((data['buy_signal'] == 1) & (data['buy_signal'].shift(1) == 1), 0, data['buy_signal'])
-    data['sell_signal'] = np.where((data['sell_signal'] == -1) & (data['sell_signal'].shift(1) == -1), 0,
-                                   data['sell_signal'])
-    data['signal'] = data['buy_signal'] + data['sell_signal']
+def  calculate_cum_prof(data):
+    """
+    计算累计收益率 1*(1+3%)
+    :param data: dataframe
+    :return:
+    """
+    data['cum_profit'] = pd.DataFrame((1 + data['profit_pct'])).cumprod() - 1
     return data
 
 
@@ -59,32 +73,3 @@ def caculate_sharpe(data):
     sharpe = avg_return / sd_return
     sharpe_year = sharpe * np.sqrt(252)
     return sharpe, sharpe_year
-
-def  calculate_cum_prof(data):
-    """
-    计算累计收益率 1*(1+3%)
-    :param data: dataframe
-    :return:
-    """
-    data['cum_profit'] = pd.DataFrame((1 + data['profit_pct'])).cumprod() - 1
-    return data
-
-
-def week_period_strategy(code, start_time, end_time):
-    data = st.get_single_stock_price(code, start_time, end_time);
-    data['buy_signal'] = np.where(data.index.weekday == 3, 1, 0);
-    data['sell_signal'] = np.where(data.index.weekday == 1, -1, 0);
-    data = compose_singal(data);
-    data = calculate_profit_pct(data);
-    data = calculate_cum_prof(data)  # 计算累计收益率
-    data = calculate_max_drawdown(data, 252) # 计算最大回撤比
-    print(data[['close', 'signal', 'profit_pct', 'cum_profit', 'max_dd']]);
-    show_chart(data[['cum_profit']])
-
-
-def show_chart(data):
-    data.plot();
-    plt.show();
-
-
-
