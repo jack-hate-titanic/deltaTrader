@@ -29,7 +29,7 @@ def ma_strategy(data, short_window=5, long_window=20):
     # print(data[['close', 'short_ma', 'long_ma', 'signal']])
 
     # 计算单次收益
-    data = strat.calculate_prof_pct(data)
+    data = strat.calculate_profit_pct(data)
     # print(data.describe())
 
     # 计算累计收益
