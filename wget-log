@@ -1,0 +1,36 @@
+Connecting to prdownloads.sourceforge.net (prdownloads.sourceforge.net)|204.68.111.105|:80... connected.
+HTTP request sent, awaiting response... No data received.
+Retrying.
+
+--2022-12-25 21:46:59--  (try: 8)  http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+Connecting to prdownloads.sourceforge.net (prdownloads.sourceforge.net)|204.68.111.105|:80... connected.
+HTTP request sent, awaiting response... No data received.
+Retrying.
+
+--2022-12-25 21:47:18--  (try: 9)  http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+Connecting to prdownloads.sourceforge.net (prdownloads.sourceforge.net)|204.68.111.105|:80... connected.
+HTTP request sent, awaiting response... No data received.
+Retrying.
+
+--2022-12-25 21:47:38--  (try:10)  http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+Connecting to prdownloads.sourceforge.net (prdownloads.sourceforge.net)|204.68.111.105|:80... connected.
+HTTP request sent, awaiting response... No data received.
+Retrying.
+
+--2022-12-25 21:47:58--  (try:11)  http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+Connecting to prdownloads.sourceforge.net (prdownloads.sourceforge.net)|204.68.111.105|:80... connected.
+HTTP request sent, awaiting response... No data received.
+Retrying.
+
+--2022-12-28 20:57:49--  (try:12)  http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+Connecting to prdownloads.sourceforge.net (prdownloads.sourceforge.net)|204.68.111.105|:80... failed: Operation timed out.
+Resolving prdownloads.sourceforge.net (prdownloads.sourceforge.net)... 204.68.111.105
+Connecting to prdownloads.sourceforge.net (prdownloads.sourceforge.net)|204.68.111.105|:80... connected.
+HTTP request sent, awaiting response... No data received.
+Retrying.
+
+--2022-12-28 20:58:10--  (try:13)  http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+Connecting to prdownloads.sourceforge.net (prdownloads.sourceforge.net)|204.68.111.105|:80... connected.
+HTTP request sent, awaiting response... No data received.
+Retrying.
+
