@@ -1,5 +1,6 @@
 import data.stock as st;
+import strategy.strategy_model as model;
 
 code = '000001';
-data = st.get_csv_price(code, '2019-10-20');
+data = model.macd_strategy(code, '2022-10-01');
 print(data);

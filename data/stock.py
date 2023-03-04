@@ -70,7 +70,7 @@ def export_stock_data(data,  filename, mode=None):
     # 如果mode为a那么就是新添加数据
     if mode == 'a':
         # 因为是新加入的数据，要排到后面，所以header为false
-        data.to_csv(file_root, mode=mode, header=False);
+        data.to_csv(file_root, mode=mode, header=False, index=False);
         # 删除重复值
         data = pd.read_csv(file_root);
         # 以日期为准进行删除重复值
@@ -79,27 +79,30 @@ def export_stock_data(data,  filename, mode=None):
         data.to_csv(file_root, index=False);
     # 否则就是重新写入数据
     else:
-        data.to_csv(file_root);
+        data.to_csv(file_root, index=False);
     print('已成功存储至：', file_root);
 
 
 def update_daily_price(stock_code, start_data):
     # 是否存在文件：不存在-重新获取， 存在-获取csv文件中的最后一天，然后请求csv文件中的最后一天到今天的数据，并写入csv文件中
-    file_root = data_root + '/' + stock_code + '.csv';
-    date_columns_data = pd.read_csv(file_root, usecols=['date']);
+    file_root = data_root + stock_code + '.csv';
+    print(file_root);
     # 如果存在对应文件
     if os.path.exists(file_root):
+        date_columns_data = pd.read_csv(file_root, usecols=['date']);
         # 读取csv文件，并获取csv文件中最后一天的时间
         startdate = date_columns_data['date'].iloc[-1];
         # 请求csv文件中最后一天到今天的数据
-        df = get_single_stock_price(stock_code, startdate, datetime.datetime.today().strftime('%Y%m%d'));
-        # 添加到csv文件中
-        export_stock_data(df, stock_code, 'a');
+        if startdate != datetime.datetime.today().strftime('%Y-%m-%d'):
+            df = get_single_stock_price(stock_code, startdate, datetime.datetime.today().strftime('%Y%m%d'));
+            # 添加到csv文件中
+            export_stock_data(df, stock_code, 'a');
     else:
         # 重新获取该股票行情数据
-        df = get_single_stock_price(stock_code);
+        df = get_single_stock_price(stock_code, start_data);
         export_stock_data(df, stock_code);
     # 判断start_data是小于csv文件的时间列的第一个值
+    date_columns_data = pd.read_csv(file_root);
     csv_start_data = date_columns_data['date'].iloc[0];
     # 转化为时间戳
     if start_data < csv_start_data:
@@ -128,9 +131,11 @@ def get_csv_price(code, start_date, end_date=None, columns=None):
     # 读取数据
     file_root = data_root + '/' + code + '.csv';
     if columns is None:
-        data = pd.read_csv(file_root, index_col='date');
+        data = pd.read_csv(file_root);
     else:
         data = pd.read_csv(file_root, usecols=columns, index_col='date')
+
+    handle_data(data);
     # 根据日期筛选股票数据
     return data[(data.index >= start_date) & (data.index <= end_date)];
 

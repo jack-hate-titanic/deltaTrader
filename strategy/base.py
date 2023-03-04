@@ -1,20 +1,42 @@
 import numpy as np;
 import pandas as pd;
 import matplotlib.pyplot as plt;
+import datetime;
 
-
-def show_chart(data):
+def show_chart(data, code):
+    data = data['cum_profit'];
     data.plot();
+    plt.title(code);
     plt.show();
 
+def show_buy_sell_chart(data, code):
+    fig, ax = plt.subplots()
+    ax.plot(data.index, data['close'])
+    plt.title(code);
+    buy = data.loc[data['buy_signal'] == 1];
+    sell = data.loc[data['sell_signal'] == -1];
+    for index, row in buy.iterrows():
+        ax.annotate('B', xy=(index, row['close']),
+                    arrowprops=dict(facecolor='red', shrink=0.05))
+    for index, row in sell.iterrows():
+
+        ax.annotate('S', xy=(index, row['close']),
+                    arrowprops=dict(facecolor='green', shrink=0.05))
+    plt.show();
 
 def compose_signal(data):
     # 整合信号
-    data['buy_signal'] = np.where((data['buy_signal'] == 1) & (data['buy_signal'].shift(1) == 1), 0, data['buy_signal'])
-    data['sell_signal'] = np.where((data['sell_signal'] == -1) & (data['sell_signal'].shift(1) == -1), 0,
-                                   data['sell_signal'])
-    data['signal'] = data['buy_signal'] + data['sell_signal']
-    return data
+    # 只留下buy_signal为1，sell_signal为-1的日期
+    data = data.loc[(data['buy_signal'] != 0) | (data['sell_signal'] != 0)]
+    # buy_signal 为买入信号，设置为1，如果当前买入信号为1并且前一个买入信号也为1，那么设置当前买入信号为零
+    data.loc[(data['buy_signal'] == 1) & (data['buy_signal'].shift(1) == 1), 'buy_signal'] = 0
+    # sell_signal 为卖出信号，设置为-1，如果当前卖出信号为-1并且前一个卖出信号也为-1，那么设置当前卖出信号为零
+    data.loc[(data['sell_signal'] == -1) & (data['sell_signal'].shift(1) == -1), 'sell_signal'] = 0
+    # signal
+    data_copy = data.copy();
+    data_copy.loc[:, 'signal'] = data_copy['buy_signal'] + data_copy['sell_signal']
+    return data_copy
+
 
 
 def calculate_profit_pct(data):
@@ -45,7 +67,7 @@ def calculate_max_drawdown(data, window):
     return data;
 
 
-def  calculate_cum_prof(data):
+def calculate_cum_prof(data):
     """
     计算累计收益率 1*(1+3%)
     :param data: dataframe
