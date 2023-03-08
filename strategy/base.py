@@ -26,8 +26,6 @@ def show_buy_sell_chart(data, code):
 
 def compose_signal(data):
     # 整合信号
-    # 只留下buy_signal为1，sell_signal为-1的日期
-    data = data.loc[(data['buy_signal'] != 0) | (data['sell_signal'] != 0)]
     # buy_signal 为买入信号，设置为1，如果当前买入信号为1并且前一个买入信号也为1，那么设置当前买入信号为零
     data.loc[(data['buy_signal'] == 1) & (data['buy_signal'].shift(1) == 1), 'buy_signal'] = 0
     # sell_signal 为卖出信号，设置为-1，如果当前卖出信号为-1并且前一个卖出信号也为-1，那么设置当前卖出信号为零
@@ -35,6 +33,11 @@ def compose_signal(data):
     # signal
     data_copy = data.copy();
     data_copy.loc[:, 'signal'] = data_copy['buy_signal'] + data_copy['sell_signal']
+    # 如果第一条数据的sell_signal为-1的话，那么删除这条数据
+    data_signal = data_copy[data_copy['signal'] != 0];
+    if data_signal.iloc[0]['signal'] == -1:
+        data_copy.loc[data_signal.index[0], 'sell_signal'] = 0;
+        data_copy.loc[data_signal.index[0], 'signal'] = 0;
     return data_copy
 
 
@@ -73,8 +76,9 @@ def calculate_cum_prof(data):
     :param data: dataframe
     :return:
     """
-    data['cum_profit'] = pd.DataFrame((1 + data['profit_pct'])).cumprod() - 1
-    return data
+    data_copy = data.copy()
+    data_copy.loc[:, 'cum_profit'] = (1 + data_copy['profit_pct']).cumprod() - 1
+    return data_copy
 
 
 def caculate_sharpe(data):
