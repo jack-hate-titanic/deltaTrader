@@ -1,8 +1,8 @@
-import data.stock as stock;
+import stock.stock as stock;
 import week_strategy.strategy as strategy;
 import pandas as pd;
 from matplotlib import pyplot as plot;
-import datetime;
+
 
 def compare_sharpe_ratio(codes=[], start_time='20180101', end_time="20220101"):
     # 获取三只股票的年华夏普比率

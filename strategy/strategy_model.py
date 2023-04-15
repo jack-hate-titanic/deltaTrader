@@ -1,4 +1,4 @@
-import data.stock as st;
+import stock.stock as st;
 import numpy as np;
 import pandas as pd;
 import talib;

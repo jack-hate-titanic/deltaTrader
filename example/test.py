@@ -1,6 +1,9 @@
-import data.stock as st;
-import strategy.strategy_model as model;
+import stock.stock as st;
+import datetime;
 
 code = '000001';
-data = model.macd_strategy(code, '2022-10-01');
+the_date = datetime.datetime.now().strftime('%Y-%m-%d')
+pre_date = (datetime.datetime.now() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+data = st.update_daily_price(code, pre_date);
+# data = st.get_all_stock_data()
 print(data);
