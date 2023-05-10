@@ -1,19 +1,16 @@
-"""
-Author: 悦者生存 1002783067@qq.com
-Date: 2022-05-17 22:29:17
-LastEditors: 悦者生存 1002783067@qq.com
-LastEditTime: 2022-05-21 10:36:47
-FilePath: /python/deltaTrader/data/stock.py
-Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
-"""
-# 参考地址 https://github.com/Delta-F/DeltaTrader/blob/master/data/stock.py
+
+import sys
+import os
 import os.path
+sys.path.append(os.path.dirname(sys.path[0]))
 
 # 引入efinance库
 import efinance as ef;
 import pandas as pd;
 import datetime;
+import talib;
 import time;
+
 
 # 设置行列不忽略
 # pd.set_option('display.max_rows', 100000)
@@ -47,9 +44,9 @@ def get_all_stock_data():
     data = pd.read_csv(file_root, converters={'code': str});
     for i in range(len(data['code'])):
         code = data['code'].iloc[i]
-        the_date = datetime.datetime.now().strftime('%Y-%m-%d')
-        pre_date = (datetime.datetime.now() - datetime.timedelta(days = 30)).strftime('%Y-%m-%d')
-        get_csv_price(code, pre_date, the_date);
+        # the_date = datetime.datetime.now().strftime('%Y-%m-%d')
+        # pre_date = (datetime.datetime.now() - datetime.timedelta(days = 30)).strftime('%Y-%m-%d')
+        get_csv_price(code);
     print('获取成功')
 
 
@@ -106,19 +103,22 @@ def export_stock_data(data,  filename, mode=None):
     print('已成功存储至：', file_root);
 
 
-def update_daily_price(stock_code, start_data):
+def update_daily_price(stock_code, start_data=None):
     # 是否存在文件：不存在-重新获取， 存在-获取csv文件中的最后一天，然后请求csv文件中的最后一天到今天的数据，并写入csv文件中
     file_root = data_price_root + stock_code + '.csv';
     # 如果存在对应文件
     if os.path.exists(file_root):
         date_columns_data = pd.read_csv(file_root, usecols=['date', 'update_time']);
         # 读取csv文件，并获取csv文件中最后更新时间
-        startdate = date_columns_data['update_time'].iloc[-1];
-        # 请求csv文件中最后一天到今天的数据
-        if startdate == datetime.datetime.today().strftime('%Y-%m-%d'):
-            df = get_single_stock_price(stock_code, startdate, datetime.datetime.today().strftime('%Y%m%d'));
-            # 添加到csv文件中
-            export_stock_data(df, stock_code, 'a');
+        if date_columns_data['update_time'].empty:
+            print('为空'+stock_code);
+        else:
+            startdate = date_columns_data['update_time'].iloc[-1];
+            # 请求csv文件中最后一天到今天的数据
+            if startdate != datetime.datetime.today().strftime('%Y-%m-%d'):
+                df = get_single_stock_price(stock_code, startdate, datetime.datetime.today().strftime('%Y%m%d'));
+                # 添加到csv文件中
+                export_stock_data(df, stock_code, 'a');
     else:
         # 重新获取该股票行情数据
         df = get_single_stock_price(stock_code, start_data);
@@ -173,6 +173,12 @@ def get_ma_data(data):
     copy_data['ma_20'] = data['close'].rolling(window=20, min_periods=20).mean()
     return copy_data;
 
+def get_macd_data(data):
+    copy_data = data.copy();
+    copy_data['diff'], copy_data['dea'], copy_data['macd'] = talib.MACD(copy_data['close'], fastperiod=12, slowperiod=26, signalperiod=9);
+    copy_data['macd'] *= 2;
+    return copy_data;
+
 
 def handle_data(data):
     # 数据转化
@@ -197,6 +203,7 @@ def handle_data(data):
         data.index = pd.to_datetime(data['date']);
     if 'close' in data:
         data = get_ma_data(data);
+        data = get_macd_data(data);
     if 'update_time' not in data:
         data.insert(data.shape[1], 'update_time', datetime.datetime.today().strftime('%Y-%m-%d'));
     return data;
